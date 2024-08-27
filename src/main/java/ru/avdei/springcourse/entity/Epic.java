@@ -25,4 +25,11 @@ public class Epic extends Task {
     public void setStatus(Status status) {
         throw new UnsupportedOperationException("Установка поля запрещена в дочернем классе");
     }
+
+    @Override
+    public Status getStatus() {
+        // TODO
+
+        return null;
+    }
 }
