@@ -1,21 +1,18 @@
 package ru.avdei.springcourse.repository;
-import ru.avdei.springcourse.entity.Epic;
-import ru.avdei.springcourse.entity.Status;
-import ru.avdei.springcourse.entity.SubTask;
-import ru.avdei.springcourse.entity.Task;
+import ru.avdei.springcourse.entity.*;
 
 import java.util.*;
 
-public class TaskRepository implements Repository {
-    private List<Task> allTasks;
+public class TaskRepository {
+    private Map<Integer, Task> allTasks;
 
 
     public TaskRepository() {
-        this.allTasks = new ArrayList<>();
+        this.allTasks = new HashMap<>();
     }
 
-    public List<Task> getAllTasks() {
-        return allTasks;
+    public Map<Integer, Task> getAllTasks() {
+       return allTasks;
     }
 
     @Override
@@ -26,7 +23,7 @@ public class TaskRepository implements Repository {
     }
 
     public void addTask(Task task) {
-        allTasks.add(task);
+        allTasks.put(task.getId(), task);
     }
 
     public void deleteAllTasks() {
@@ -34,20 +31,46 @@ public class TaskRepository implements Repository {
     }
 
     public Task findById(int id) {
-        return allTasks.stream().filter(task -> task.getId() == id).findFirst().orElse(null);
+        return allTasks.get(id);
+    }
+
+    public Epic findEpicById(int id){
+        if (allTasks.get(id) instanceof Epic) {
+            return (Epic) allTasks.get(id);
+        }
+        return null;
     }
 
     public void update(Task task) {
-        removeById(task.getId());
-        allTasks.add(task);
+        allTasks.put(task.getId(), task);
 
     }
 
     public void removeById(int id) {
-        allTasks.remove(findById(id));
+        allTasks.remove(id);
     }
 
     public void updateTaskStatus(int id, Status status) {
-        allTasks.stream().filter(task -> task.getId() == id).forEach(task -> task.setStatus(status));
+        if (allTasks.get(id) instanceof Epic) {
+            ((Epic) allTasks.get(id)).setStatus();
+            return;
+
+        }
+        Task task = allTasks.get(id);
+        task.setStatus(status);
+        allTasks.put(id, task);
+    }
+    public List<SubTask> getSubTasksOfEpicById(int id){
+        List<SubTask> list = new ArrayList<>();
+
+        for (Map.Entry<Integer, Task> entry : allTasks.entrySet()){
+            if (entry.getValue() instanceof SubTask){
+                SubTask subTask = (SubTask) entry.getValue();
+                if (subTask.getEpicId() == id){
+                    list.add(subTask);
+                }
+            }
+        }
+        return list;
     }
 }

@@ -5,10 +5,14 @@ import ru.avdei.springcourse.entity.Task;
 import ru.avdei.springcourse.service.TaskService;
 
 import java.util.List;
+import java.util.Map;
 
 public class TaskController {
     private TaskService taskService;
 
+    public TaskController() {
+        this.taskService = new TaskService();
+    }
     public TaskController(TaskService taskService) {
         this.taskService = taskService;
     }
@@ -22,9 +26,9 @@ public class TaskController {
     }
 
     public void getTasks() {
-        List<Task> tasks = taskService.getTasks();
-        for (Task task : tasks) {
-            System.out.println(task);
+        Map<Integer, Task> tasks = taskService.getTasks();
+        for (Map.Entry<Integer, Task> task : tasks.entrySet()) {
+            System.out.println(task.getValue());
         }
     }
 
@@ -50,5 +54,8 @@ public class TaskController {
 
     public void updateStatus(int id, Status status) {
         taskService.updateStatus(id, status);
+    }
+    public void getSubTasksOfEpicById(int id){
+        taskService.getSubTasksOfEpicById(id);
     }
 }
