@@ -2,26 +2,25 @@ package ru.avdei.springcourse.controller;
 
 import ru.avdei.springcourse.entity.Status;
 import ru.avdei.springcourse.entity.Task;
-import ru.avdei.springcourse.service.TaskService;
+import ru.avdei.springcourse.service.TaskServiceImpl;
 
-import java.util.List;
 import java.util.Map;
 
 public class TaskController {
-    private TaskService taskService;
+    private TaskServiceImpl taskService;
 
     public TaskController() {
-        this.taskService = new TaskService();
+        this.taskService = new TaskServiceImpl();
     }
-    public TaskController(TaskService taskService) {
+    public TaskController(TaskServiceImpl taskService) {
         this.taskService = taskService;
     }
 
-    public TaskService getTaskService() {
+    public TaskServiceImpl getTaskService() {
         return taskService;
     }
 
-    public void setTaskService(TaskService taskService) {
+    public void setTaskService(TaskServiceImpl taskService) {
         this.taskService = taskService;
     }
 
@@ -57,5 +56,9 @@ public class TaskController {
     }
     public void getSubTasksOfEpicById(int id){
         taskService.getSubTasksOfEpicById(id);
+    }
+
+    public void getHistory(){
+        taskService.getLastSeenTasks();
     }
 }

@@ -1,8 +1,6 @@
 package ru.avdei.springcourse.application;
-
 import ru.avdei.springcourse.controller.TaskController;
 import ru.avdei.springcourse.entity.Status;
-
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -48,6 +46,8 @@ public class AppInitialization {
                 case 7:
                     case7(scanner, controller);
                     break;
+                case 8: controller.getHistory();
+                break;
                 default:
                     initiateExit = true;
                     System.out.println("Выход из программы.");
@@ -119,6 +119,7 @@ public class AppInitialization {
                 "4. Создать задачу.\n" +
                 "5. Удалить по АйДи.\n" +
                 "6. Получение списка подзадач определенного Эпика по АйДи.\n" +
-                "7. Изменить статус задачи (кроме Эпика).");
+                "7. Изменить статус задачи (кроме Эпика).\n" +
+                "8. Получить последние десять просмотренных задач.");
     }
 }
