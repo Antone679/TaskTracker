@@ -1,8 +1,10 @@
 package ru.avdei.springcourse.service;
+
 import ru.avdei.springcourse.entity.*;
 import ru.avdei.springcourse.repository.TaskRepository;
 import ru.avdei.springcourse.util.IdGenerator;
 import ru.avdei.springcourse.util.ServiceManager;
+
 import java.util.*;
 
 public class TaskServiceImpl implements TaskService {
@@ -45,7 +47,7 @@ public class TaskServiceImpl implements TaskService {
             mapToReturn.put(0, zeroTask);
             return mapToReturn;
         }
-        for(Map.Entry<Integer, Task> tmp : taskRepository.getAllTasks().entrySet()) {
+        for (Map.Entry<Integer, Task> tmp : taskRepository.getAllTasks().entrySet()) {
             if (tmp.getValue() instanceof SubTask) {
                 continue;
             }
@@ -67,9 +69,9 @@ public class TaskServiceImpl implements TaskService {
         if (type.equals("SUBTASK")) {
             System.out.println("Теперь введите ID EPIC задачи, к которой принадлежит создаваемая задача:");
             int epicId = 0;
-            try{
+            try {
                 epicId = scanner.nextInt();
-            } catch (InputMismatchException ex){
+            } catch (InputMismatchException ex) {
                 return;
             }
 
@@ -78,6 +80,7 @@ public class TaskServiceImpl implements TaskService {
             subTask.setId(IdGenerator.generateId());
             taskRepository.addTask(subTask);
             Epic epic = findEpicById(epicId);
+            historyService.remove(epic);
             epic.getSubtasks().add(subTask);
             taskRepository.updateTaskStatus(epic.getId(), Status.NEW);
             return;
@@ -100,7 +103,7 @@ public class TaskServiceImpl implements TaskService {
 
         Task task;
         try {
-           task = new Task(name, description, TaskType.valueOf(type));
+            task = new Task(name, description, TaskType.valueOf(type));
         } catch (IllegalArgumentException ex) {
             System.out.println("Некорректно ввел статус задачи. Она не сохранена.");
             return;
@@ -113,6 +116,7 @@ public class TaskServiceImpl implements TaskService {
 
     public void deleteAllTasks() {
         taskRepository.deleteAllTasks();
+        historyService.clear();
         System.out.println("Все задачи удалены.");
     }
 
@@ -142,11 +146,31 @@ public class TaskServiceImpl implements TaskService {
     }
 
     public void removeById(int id) {
-        if (taskRepository.findById(id) == null) {
+        Task task = taskRepository.findById(id);
+
+        if (task == null) {
             System.out.println("Такой задачи нет.");
             return;
         }
+        if (task instanceof Epic) {
+            List<SubTask> lisOfSubtasks = ((Epic) task).getSubtasks();
+            Iterator<SubTask> iterator = lisOfSubtasks.iterator();
 
+            while (iterator.hasNext()) {
+                SubTask subTask = iterator.next();
+                historyService.remove(subTask);
+                taskRepository.removeById(subTask.getId());
+                iterator.remove();
+            }
+        }
+
+        if (task instanceof SubTask){
+            Epic epic = findEpicById(((SubTask) task).getEpicId());
+            historyService.remove(epic);
+            epic.getSubtasks().remove(task);
+        }
+
+        historyService.remove(task);
         taskRepository.removeById(id);
     }
 
@@ -161,7 +185,7 @@ public class TaskServiceImpl implements TaskService {
             System.out.println("Ничего нет. Возможно, список подзадач пуст, либо такого Эпика не существует.");
 
         for (SubTask subTask : list) {
-           historyService.add(subTask);
+            historyService.add(subTask);
             System.out.println(subTask);
         }
     }

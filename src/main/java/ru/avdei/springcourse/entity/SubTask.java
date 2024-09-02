@@ -1,5 +1,7 @@
 package ru.avdei.springcourse.entity;
 
+import java.util.Objects;
+
 public class SubTask extends Task {
 
     private int epicId;
@@ -22,4 +24,17 @@ public class SubTask extends Task {
         this.epicId = epicId;
     }
 
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        if (!super.equals(object)) return false;
+        SubTask subTask = (SubTask) object;
+        return epicId == subTask.epicId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), epicId);
+    }
 }

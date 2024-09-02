@@ -2,6 +2,7 @@ package ru.avdei.springcourse.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Epic extends Task {
 
@@ -44,5 +45,19 @@ public class Epic extends Task {
             return Status.DONE;
         }
         return Status.IN_PROGRESS;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        if (!super.equals(object)) return false;
+        Epic epic = (Epic) object;
+        return Objects.equals(subtasks, epic.subtasks);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), subtasks);
     }
 }

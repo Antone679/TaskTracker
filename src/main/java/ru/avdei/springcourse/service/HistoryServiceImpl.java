@@ -16,7 +16,11 @@ public class HistoryServiceImpl implements HistoryService {
     public void add(Task task) {
         if (!lastSeenTasks.contains(task)) {
             lastSeenTasks.add(task);
+        } else {
+            lastSeenTasks.remove(task);
+            lastSeenTasks.add(task);
         }
+
         if (lastSeenTasks.size() == 11) {
             lastSeenTasks.remove(0);
         }
@@ -32,5 +36,15 @@ public class HistoryServiceImpl implements HistoryService {
             System.out.println(task.toString());
             System.out.println(".".repeat(50));
         }
+    }
+
+    @Override
+    public void remove(Task task) {
+        lastSeenTasks.remove(task);
+    }
+
+    @Override
+    public void clear() {
+        lastSeenTasks.clear();
     }
 }

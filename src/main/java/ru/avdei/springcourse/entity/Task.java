@@ -1,5 +1,7 @@
 package ru.avdei.springcourse.entity;
 
+import java.util.Objects;
+
 public class Task {
     private String name;
     private String description;
@@ -61,5 +63,18 @@ public class Task {
                 ", Description='" + description + '\'' +
                 ", id=" + id +
                 ", status=" + status;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Task task = (Task) object;
+        return id == task.id && Objects.equals(name, task.name) && Objects.equals(description, task.description) && status == task.status && taskType == task.taskType;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, description, id, status, taskType);
     }
 }
