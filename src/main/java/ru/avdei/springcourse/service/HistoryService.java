@@ -10,4 +10,5 @@ public interface HistoryService {
     void remove(Task task);
 
     void clear();
+    List<Task> getLastSeenTasks();
 }

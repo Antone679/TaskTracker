@@ -7,7 +7,6 @@ public class Task {
     private String description;
     private int id;
     private Status status;
-
     private TaskType taskType;
 
     public Task(String name, String description, TaskType taskType) {
@@ -15,6 +14,10 @@ public class Task {
         this.description = description;
         this.taskType = taskType;
         this.status = Status.NEW;
+    }
+
+    public void setTaskType(TaskType taskType) {
+        this.taskType = taskType;
     }
 
     public String getName() {
@@ -59,10 +62,11 @@ public class Task {
             return "Задач нет.";
 
         return
-                "Name='" + name + '\'' +
-                ", Description='" + description + '\'' +
-                ", id=" + id +
-                ", status=" + status;
+                "Задача: " + name + "\n" +
+                "описание: " + description + "\n" +
+                "ID - " + id + "\n" +
+                "статус: " + status + "\n" +
+                        ".".repeat(50);
     }
 
     @Override

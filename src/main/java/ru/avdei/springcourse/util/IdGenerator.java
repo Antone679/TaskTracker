@@ -7,5 +7,11 @@ public class IdGenerator {
         newId++;
         return newId;
     }
+    public static void setGeneratorId(int count){
+        newId = count;
+    }
 
+    public static int getCurrentId() {
+        return newId;
+    }
 }

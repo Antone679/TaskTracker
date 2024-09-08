@@ -2,6 +2,7 @@ package ru.avdei.springcourse.controller;
 
 import ru.avdei.springcourse.entity.Status;
 import ru.avdei.springcourse.entity.Task;
+import ru.avdei.springcourse.service.SerializableServiceImpl;
 import ru.avdei.springcourse.service.TaskServiceImpl;
 
 import java.util.Map;
@@ -10,7 +11,7 @@ public class TaskController {
     private TaskServiceImpl taskService;
 
     public TaskController() {
-        this.taskService = new TaskServiceImpl();
+        this.taskService = new SerializableServiceImpl();
     }
     public TaskController(TaskServiceImpl taskService) {
         this.taskService = taskService;

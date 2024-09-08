@@ -8,8 +8,8 @@ import ru.avdei.springcourse.util.ServiceManager;
 import java.util.*;
 
 public class TaskServiceImpl implements TaskService {
-    private TaskRepository taskRepository;
-    private HistoryService historyService;
+    protected TaskRepository taskRepository;
+    protected HistoryService historyService;
 
     public TaskServiceImpl() {
 
@@ -189,4 +189,5 @@ public class TaskServiceImpl implements TaskService {
             System.out.println(subTask);
         }
     }
+
 }

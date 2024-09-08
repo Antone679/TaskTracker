@@ -16,6 +16,12 @@ public class HistoryServiceImpl implements HistoryService {
         this.linked = new MyLinkedList();
     }
 
+    public List<Task> getLastSeenTasks() {
+        lastSeenTasks.clear();
+        linked.getTasks(lastSeenTasks); // Обновляем lastSeenTasks из linked
+        return lastSeenTasks;
+    }
+
     @Override
     public void add(Task task) {
         Node toAdd = new Node(task);
@@ -28,17 +34,20 @@ public class HistoryServiceImpl implements HistoryService {
 
         nodeMap.put(task.getId(), toAdd);
         linked.linkLast(toAdd);
+
+        // Убираем очистку lastSeenTasks здесь
+        // Обновляем lastSeenTasks, если вам нужно (это можно сделать в getLastSeenTasks)
     }
 
     @Override
     public void getHistory() {
         lastSeenTasks.clear();
-        linked.getTasks();
+        linked.getTasks(lastSeenTasks); // Обновляем lastSeenTasks
 
-        if (lastSeenTasks == null || lastSeenTasks.isEmpty()){
+        if (lastSeenTasks.isEmpty()) {
             System.out.println("Недавно просмотренных задач нет.");
-        return;
-    }
+            return;
+        }
         System.out.println("Просмотренные недавно задачи:\n");
 
         for (Task task : lastSeenTasks) {
@@ -49,45 +58,46 @@ public class HistoryServiceImpl implements HistoryService {
 
     @Override
     public void remove(Task task) {
-        linked.removeNode(nodeMap.get(task.getId()));
-        nodeMap.remove(task.getId());
+        if (nodeMap.containsKey(task.getId())) { // Проверяем, существует ли задача
+            linked.removeNode(nodeMap.get(task.getId()));
+            nodeMap.remove(task.getId());
+        }
 
+        // Убираем очистку lastSeenTasks здесь
+        // Обновляем lastSeenTasks, если вам нужно (это можно сделать в getLastSeenTasks)
     }
 
     @Override
     public void clear() {
         linked.clear();
+        lastSeenTasks.clear(); // Очищаем историю
     }
 
     private class MyLinkedList {
         private Node head;
         private Node last;
-        private int size;
 
         public MyLinkedList() {
             this.head = null;
             this.last = null;
-            this.size = 0;
         }
 
         public void linkLast(Node newNode) {
-
             if (head == null) {
                 head = newNode;
                 last = newNode;
-                size++;
                 return;
             }
 
             last.setNext(newNode);
+            newNode.setPrev(last);
             last = newNode;
-            size++;
-
         }
-        public void getTasks() {
+
+        public void getTasks(List<Task> tasks) { // Передаем список для заполнения
             Node current = head;
             while (current != null) {
-                lastSeenTasks.add(current.getTask());
+                tasks.add(current.getTask());
                 current = current.getNext();
             }
         }
@@ -102,16 +112,13 @@ public class HistoryServiceImpl implements HistoryService {
             }
             if (node.getNext() != null) {
                 node.getNext().setPrev(node.getPrev());
-            } else {
-                last = node.getPrev();
+            } else {last = node.getPrev();
             }
-            size--;
         }
 
         public void clear() {
             head = null;
             last = null;
-            size = 0;
         }
     }
 }

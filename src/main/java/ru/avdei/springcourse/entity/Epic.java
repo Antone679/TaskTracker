@@ -19,8 +19,12 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return getName() + ": " + subtasks + ": " +
-                getDescription() + ": " + getId() + ": " + getStatus();
+        return "Большая задача: " + getName() + "\n" +
+                "подзадачи: " + subtasks + "\n" +
+                "описание: " + getDescription() + "\n" +
+                "ID - " + getId() + "\n" +
+                "статус: " + getStatus() + "\n" +
+                ".".repeat(50);
     }
 
     public void setStatus() {
@@ -61,3 +65,4 @@ public class Epic extends Task {
         return Objects.hash(super.hashCode(), subtasks);
     }
 }
+
