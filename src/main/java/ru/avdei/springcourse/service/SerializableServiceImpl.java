@@ -24,6 +24,12 @@ public class SerializableServiceImpl extends TaskServiceImpl {
         super.createTask();
         Task task = taskRepository.findById(IdGenerator.getCurrentId());
         saveToCSV(saveToString(task));
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        writeHistory();
 
     }
 
@@ -35,6 +41,12 @@ public class SerializableServiceImpl extends TaskServiceImpl {
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка удаления всех задач!");
         }
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        writeHistory();
     }
 
     @Override
@@ -42,12 +54,24 @@ public class SerializableServiceImpl extends TaskServiceImpl {
         super.updateTask(task);
         deleteFromCSV(task);
         saveToCSV(saveToString(task));
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        writeHistory();
     }
 
     @Override
     public void removeById(int id) {
         super.removeById(id);
         deleteFromCSV(taskRepository.findById(id));
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        writeHistory();
     }
 
     @Override
@@ -55,23 +79,28 @@ public class SerializableServiceImpl extends TaskServiceImpl {
         super.updateStatus(id, status);
         deleteFromCSV(taskRepository.findById(id));
         saveToCSV(saveToString(taskRepository.findById(id)));
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        writeHistory();
     }
 
-    private String saveToString(Task task) {
+    protected String saveToString(Task task) {
         StringBuilder sb = new StringBuilder();
-        String delimeter = ",";
-        sb.append(task.getId()).append(delimeter).append(task.getTaskType()).append(delimeter).append(task.getName())
-                .append(delimeter).append(task.getStatus()).append(delimeter).append(task.getDescription());
+        String delimiter = ",";
+        sb.append(task.getId()).append(delimiter).append(task.getTaskType()).append(delimiter).append(task.getName())
+                .append(delimiter).append(task.getStatus()).append(delimiter).append(task.getDescription());
 
         if (task instanceof SubTask) {
-            sb.append(delimeter).append(((SubTask) task).getEpicId());
+            sb.append(delimiter).append(((SubTask) task).getEpicId());
         }
 
         return sb.toString();
     }
 
-    private void saveToCSV(String line) {
-
+    protected void saveToCSV(String line) {
         Path tempFile = Paths.get("src/main/resources/temp.csv");
 
         try (BufferedReader reader = new BufferedReader(new FileReader(csvFile.toFile()));
@@ -98,7 +127,12 @@ public class SerializableServiceImpl extends TaskServiceImpl {
         }
     }
 
-    private void deleteFromCSV(Task task) {
+    protected void deleteFromCSV(Task task) {
+
+        if (task == null){
+            return;
+        }
+
         Path tempFile = Paths.get("src/main/resources/temp.csv");
 
         try (BufferedReader reader = new BufferedReader(new FileReader(csvFile.toFile()));
@@ -121,7 +155,7 @@ public class SerializableServiceImpl extends TaskServiceImpl {
         }
     }
 
-    private Task getFromString(String line) {
+    protected Task getFromString(String line) {
         Task task = null;
         String[] arrayOfData = line.split(",");
         int id = Integer.parseInt(arrayOfData[0]);
@@ -152,7 +186,7 @@ public class SerializableServiceImpl extends TaskServiceImpl {
 
     }
 
-    private void initializeTasks() {
+    protected void initializeTasks() {
         try (BufferedReader reader = new BufferedReader(new FileReader(csvFile.toFile()))) {
             reader.readLine();
             String currentLine;
@@ -171,7 +205,7 @@ public class SerializableServiceImpl extends TaskServiceImpl {
         }
     }
 
-    private void historyInit(BufferedReader reader) throws IOException {
+    protected void historyInit(BufferedReader reader) throws IOException {
         String currentLine;
         while ((currentLine = reader.readLine()) != null) {
             if (!currentLine.isEmpty()) {
@@ -184,7 +218,7 @@ public class SerializableServiceImpl extends TaskServiceImpl {
         }
     }
 
-    private void organizeSubAndEpics() {
+    protected void organizeSubAndEpics() {
         for (Map.Entry<Integer, Task> entry : taskRepository.getAllTasks().entrySet()) {
             Task task = entry.getValue();
 
@@ -196,7 +230,7 @@ public class SerializableServiceImpl extends TaskServiceImpl {
         }
     }
 
-    private void writeHistory() {
+    protected void writeHistory() {
         Path tempFile = Paths.get("src/main/resources/historyTmp.csv");
 
         try (BufferedReader reader = new BufferedReader(new FileReader(csvFile.toFile()));

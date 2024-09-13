@@ -10,6 +10,7 @@ import java.util.*;
 public class TaskServiceImpl implements TaskService {
     protected TaskRepository taskRepository;
     protected HistoryService historyService;
+    private static Scanner scanner = new Scanner(System.in);
 
     public TaskServiceImpl() {
 
@@ -34,6 +35,9 @@ public class TaskServiceImpl implements TaskService {
     public HistoryService getHistoryService() {
         return historyService;
     }
+    public static void setScanner(Scanner scanner) {
+        TaskServiceImpl.scanner = scanner;
+    }
 
     public void getLastSeenTasks() {
         historyService.getHistory();
@@ -41,11 +45,9 @@ public class TaskServiceImpl implements TaskService {
 
     public Map<Integer, Task> getTasks() {
         Map<Integer, Task> mapToReturn = new HashMap<>();
-        Task zeroTask = new Task("ZERO", "ZERO", TaskType.ZERO);
-        zeroTask.setStatus(Status.ZERO);
         if (taskRepository.getAllTasks().isEmpty()) {
-            mapToReturn.put(0, zeroTask);
-            return mapToReturn;
+
+            return Collections.emptyMap();
         }
         for (Map.Entry<Integer, Task> tmp : taskRepository.getAllTasks().entrySet()) {
             if (tmp.getValue() instanceof SubTask) {
@@ -58,7 +60,6 @@ public class TaskServiceImpl implements TaskService {
 
     public void createTask() {
         System.out.println("Введите наименование задачи:");
-        Scanner scanner = new Scanner(System.in);
         String name = scanner.nextLine();
 
         System.out.println("Теперь введите описание задачи:");
@@ -68,7 +69,7 @@ public class TaskServiceImpl implements TaskService {
         String type = scanner.nextLine();
         if (type.equals("SUBTASK")) {
             System.out.println("Теперь введите ID EPIC задачи, к которой принадлежит создаваемая задача:");
-            int epicId = 0;
+            int epicId;
             try {
                 epicId = scanner.nextInt();
             } catch (InputMismatchException ex) {
@@ -79,10 +80,12 @@ public class TaskServiceImpl implements TaskService {
             subTask.setEpicId(epicId);
             subTask.setId(IdGenerator.generateId());
             taskRepository.addTask(subTask);
-            Epic epic = findEpicById(epicId);
-            historyService.remove(epic);
+            Epic epic = taskRepository.findEpicById((epicId));
+//////////
             epic.getSubtasks().add(subTask);
             taskRepository.updateTaskStatus(epic.getId(), Status.NEW);
+
+
             return;
         }
 
@@ -152,28 +155,28 @@ public class TaskServiceImpl implements TaskService {
             System.out.println("Такой задачи нет.");
             return;
         }
+
         if (task instanceof Epic) {
-            List<SubTask> lisOfSubtasks = ((Epic) task).getSubtasks();
-            Iterator<SubTask> iterator = lisOfSubtasks.iterator();
+            List<SubTask> listOfSubtasks = ((Epic) task).getSubtasks();
+            Iterator<SubTask> iterator = listOfSubtasks.iterator();
 
             while (iterator.hasNext()) {
                 SubTask subTask = iterator.next();
-                historyService.remove(subTask);
-                taskRepository.removeById(subTask.getId());
-                iterator.remove();
+                historyService.remove(subTask); // Удаляем подзадачу из истории
+                taskRepository.removeById(subTask.getId()); // Удаляем подзадачу по ID
+                iterator.remove(); // Удаляем из списка эпика
+            }
+        } else if (task instanceof SubTask) {
+            Epic epic = findEpicById(((SubTask) task).getEpicId());
+            if (epic != null) { // Проверяем, что эпик существует
+                historyService.remove(epic);
+                epic.getSubtasks().remove(task); // Удаляем подзадачу из эпика
             }
         }
 
-        if (task instanceof SubTask){
-            Epic epic = findEpicById(((SubTask) task).getEpicId());
-            historyService.remove(epic);
-            epic.getSubtasks().remove(task);
-        }
-
-        historyService.remove(task);
-        taskRepository.removeById(id);
+        historyService.remove(task); // Удаляем задачу из истории
+        taskRepository.removeById(id); // Удаляем задачу по ID
     }
-
     public void updateStatus(int id, Status status) {
         taskRepository.updateTaskStatus(id, status);
     }

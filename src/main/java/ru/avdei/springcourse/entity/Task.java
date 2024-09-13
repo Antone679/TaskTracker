@@ -82,3 +82,4 @@ public class Task {
         return Objects.hash(name, description, id, status, taskType);
     }
 }
+

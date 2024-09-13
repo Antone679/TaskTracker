@@ -11,6 +11,10 @@ public class TaskRepository {
         this.allTasks = new HashMap<>();
     }
 
+    protected void setAllTasks(Map<Integer, Task> allTasks) {
+        this.allTasks = allTasks;
+    }
+
     public Map<Integer, Task> getAllTasks() {
        return allTasks;
     }
@@ -31,6 +35,10 @@ public class TaskRepository {
     }
 
     public Task findById(int id) {
+
+        if (!allTasks.containsKey(id)){
+            return null;
+        }
         return allTasks.get(id);
     }
 
