@@ -125,7 +125,7 @@ public class TaskServiceImpl implements TaskService {
 
     public Task findById(int id) {
         if (taskRepository.findById(id) == null) {
-            return new Task("ZERO", "ZERO", TaskType.ZERO);
+            return null;
         }
         Task task = taskRepository.findById(id);
         historyService.add(task);
@@ -135,7 +135,7 @@ public class TaskServiceImpl implements TaskService {
 
     public Epic findEpicById(int id) {
         if (taskRepository.findById(id) == null) {
-            return new Epic("ZERO", "ZERO", TaskType.ZERO);
+            return null;
         }
 
         Epic task = taskRepository.findEpicById(id);
@@ -169,7 +169,7 @@ public class TaskServiceImpl implements TaskService {
         } else if (task instanceof SubTask) {
             Epic epic = findEpicById(((SubTask) task).getEpicId());
             if (epic != null) { // Проверяем, что эпик существует
-                historyService.remove(epic);
+                historyService.remove(task);
                 epic.getSubtasks().remove(task); // Удаляем подзадачу из эпика
             }
         }

@@ -1,13 +1,6 @@
 id,type,name,status,description,epic
-1,EPIC,e,NEW,e
-2,SUBTASK,s,NEW,s,1
-3,TASK,t,NEW,t
-4,SUBTASK,re,NEW,re,1
-5,EPIC,f,NEW,f
-6,EPIC,SUB,NEW,SUB
-7,SUBTASK,yy,NEW,yy,5
-8,TASK,dd,NEW,ll
-9,SUBTASK,t,NEW,b,5
-10,SUBTASK,tr,NEW,tr,5
+1,TASK,gfgfgf,NEW,fgfgfgf
+2,TASK,hfhdhd,NEW,dhfdhdh
+3,EPIC,ghgfhgfh,NEW,fghgfhgfh
 
-1,5,6
+2,1

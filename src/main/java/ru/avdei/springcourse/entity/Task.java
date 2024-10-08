@@ -58,8 +58,6 @@ public class Task {
 
     @Override
     public String toString() {
-        if (name.equals("ZERO"))
-            return "Задач нет.";
 
         return
                 "Задача: " + name + "\n" +

@@ -8,15 +8,21 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class SerializableServiceImpl extends TaskServiceImpl {
 
-    private static final Path csvFile = Paths.get("src/main/resources/information.csv");
+    private static Path csvFile = Paths.get("src/main/resources/information.csv");
 
     public SerializableServiceImpl() {
         initializeTasks();
         organizeSubAndEpics();
+    }
+    protected void setCsvFile(Path path){
+        csvFile = path;
     }
 
     @Override
@@ -64,10 +70,26 @@ public class SerializableServiceImpl extends TaskServiceImpl {
 
     @Override
     public void removeById(int id) {
+        Task task = taskRepository.findById(id);
+
+        if (task instanceof Epic epic) {
+            List<SubTask> list = epic.getSubtasks();
+            List<Integer> subTaskIdsToRemove = new ArrayList<>();
+
+            for (SubTask subTask : list) {
+                subTaskIdsToRemove.add(subTask.getId());
+            }
+
+            // Удаляем подзадачи
+            for (Integer subTaskId : subTaskIdsToRemove) {
+                removeById(subTaskId);
+            }
+        }
+
         super.removeById(id);
-        deleteFromCSV(taskRepository.findById(id));
+        deleteFromCSV(task);
         try {
-            Thread.sleep(100);
+            Thread.sleep(50);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -106,15 +128,22 @@ public class SerializableServiceImpl extends TaskServiceImpl {
         try (BufferedReader reader = new BufferedReader(new FileReader(csvFile.toFile()));
              BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile.toFile()))) {
             String currentLine;
-            while ((currentLine = reader.readLine()) != null) {
-                if (currentLine.isEmpty()) {
-                    writer.write(line);
+
+            if (csvFile.toFile().length() != 0) {
+
+                while ((currentLine = reader.readLine()) != null) {
+                    if (currentLine.isEmpty()) {
+                        writer.write(line);
+                        writer.newLine();
+                        writer.newLine();
+                        continue;
+                    }
+                    writer.write(currentLine);
                     writer.newLine();
-                    writer.newLine();
-                    continue;
                 }
-                writer.write(currentLine);
-                writer.newLine();
+            }
+            else {
+                writer.write(line);
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Не удалось записать задачу в файл!");
